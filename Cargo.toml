@@ -3,6 +3,8 @@ name = "mqtt-bytes-v5"
 version = "0.1.0"
 edition = "2021"
 resolver = "2"
+homepage = "https://github.com/alfredotg/mqtt-bytes-v5"
+repository = "https://github.com/alfredotg/mqtt-bytes-v5"
 
 [features]
 default = []
