@@ -4,6 +4,7 @@
 This is a low level crate with the ability to assemble and disassemble MQTT 5 packets and is used by both client and broker. Uses 'bytes' crate internally
 
 License: Apache-2.0
+
 Based on ([rumqttc](https://github.com/bytebeamio/rumqtt))
 
 # License
