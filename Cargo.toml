@@ -1,12 +1,13 @@
 [package]
 name = "mqtt-bytes-v5"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 resolver = "2"
 homepage = "https://github.com/alfredotg/mqtt-bytes-v5"
 repository = "https://github.com/alfredotg/mqtt-bytes-v5"
 description = "MQTT v5 serialization and deserialization"
 license = "Apache-2.0"
+keywords = ["mqtt", "mqtt5"]
 
 [features]
 default = []
