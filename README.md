@@ -5,7 +5,7 @@ This is a low level crate with the ability to assemble and disassemble MQTT 5 pa
 
 License: Apache-2.0
 
-Based on ([rumqttc](https://github.com/bytebeamio/rumqtt))
+Based on [rumqttc](https://github.com/bytebeamio/rumqtt)
 
 # License
 
