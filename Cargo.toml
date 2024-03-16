@@ -1,5 +1,5 @@
 [package]
-name = "mqttbytes5"
+name = "mqtt-bytes-v5"
 version = "0.1.0"
 edition = "2021"
 resolver = "2"
