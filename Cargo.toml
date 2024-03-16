@@ -5,6 +5,8 @@ edition = "2021"
 resolver = "2"
 homepage = "https://github.com/alfredotg/mqtt-bytes-v5"
 repository = "https://github.com/alfredotg/mqtt-bytes-v5"
+description = "MQTT v5 serialization and deserialization"
+license = "Apache-2.0"
 
 [features]
 default = []
