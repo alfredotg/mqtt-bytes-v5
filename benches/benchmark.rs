@@ -1,6 +1,6 @@
 use bytes::BytesMut;
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use mqttbytes5::{Packet, Publish, PublishProperties, QoS};
+use mqtt_bytes_v5::{Packet, Publish, PublishProperties, QoS};
 
 pub fn publish_benchmark(c: &mut Criterion) {
     c.bench_function("publish", |b| {

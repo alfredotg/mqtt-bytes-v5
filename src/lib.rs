@@ -21,6 +21,8 @@ pub use self::{
     unsubscribe::{Unsubscribe, UnsubscribeProperties},
 };
 use bytes::{Buf, BufMut, Bytes, BytesMut};
+#[cfg(feature = "cow_string")]
+use std::borrow::Cow;
 use std::{fmt::Debug, slice::Iter};
 use std::{str::Utf8Error, vec};
 
@@ -42,6 +44,14 @@ mod unsubscribe;
 compile_error!(
     "feature \"boxed_string\" and feature \"binary_string\" cannot be enabled at the same time"
 );
+#[cfg(all(feature = "boxed_string", feature = "cow_string"))]
+compile_error!(
+    "feature \"boxed_string\" and feature \"cow_string\" cannot be enabled at the same time"
+);
+#[cfg(all(feature = "binary_string", feature = "cow_string"))]
+compile_error!(
+    "feature \"binary_string\" and feature \"cow_string\" cannot be enabled at the same time"
+);
 
 #[cfg(feature = "boxed_string")]
 type MqttString = Box<str>;
@@ -49,18 +59,29 @@ type MqttString = Box<str>;
 #[cfg(feature = "binary_string")]
 type MqttString = Bytes;
 
-#[cfg(all(not(feature = "boxed_string"), not(feature = "binary_string")))]
+#[cfg(feature = "cow_string")]
+type MqttString = Cow<'static, str>;
+
+#[cfg(all(
+    not(feature = "boxed_string"),
+    not(feature = "binary_string"),
+    not(feature = "cow_string")
+))]
 type MqttString = String;
 
-#[cfg(all(not(feature = "boxed_string"), not(feature = "binary_string")))]
+#[cfg(all(
+    not(feature = "boxed_string"),
+    not(feature = "binary_string"),
+    not(feature = "cow_string")
+))]
 #[inline]
 fn mqtt_string_eq(m: &MqttString, str: &str) -> bool {
     m == str
 }
 
-#[cfg(feature = "boxed_string")]
+#[cfg(any(feature = "boxed_string", feature = "cow_string"))]
 #[inline]
-fn mqtt_string_eq(m: &Box<str>, str: &str) -> bool {
+fn mqtt_string_eq(m: &MqttString, str: &str) -> bool {
     m.as_ref().eq(str)
 }
 
@@ -70,17 +91,21 @@ fn mqtt_string_eq(m: &Bytes, str: &str) -> bool {
     m.eq(str.as_bytes())
 }
 
-#[cfg(all(not(feature = "boxed_string"), not(feature = "binary_string")))]
+#[cfg(all(
+    not(feature = "boxed_string"),
+    not(feature = "binary_string"),
+    not(feature = "cow_string")
+))]
 #[inline]
 #[must_use]
-pub fn mqtt_string_new(str: &str) -> MqttString {
+pub fn mqtt_string_new(str: &'static str) -> MqttString {
     str.to_string()
 }
 
 #[cfg(feature = "boxed_string")]
 #[inline]
 #[must_use]
-pub fn mqtt_string_new(str: &str) -> MqttString {
+pub fn mqtt_string_new(str: &'static str) -> MqttString {
     str.into()
 }
 
@@ -89,6 +114,13 @@ pub fn mqtt_string_new(str: &str) -> MqttString {
 #[must_use]
 pub fn mqtt_string_new(str: &str) -> MqttString {
     Bytes::copy_from_slice(str.as_bytes())
+}
+
+#[cfg(feature = "cow_string")]
+#[inline]
+#[must_use]
+pub fn mqtt_string_new(str: &'static str) -> MqttString {
+    Cow::Borrowed(str)
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -461,7 +493,7 @@ fn read_mqtt_bytes(stream: &mut Bytes) -> Result<Bytes, Error> {
 
 /// Reads a string from bytes stream
 #[inline]
-#[cfg(not(feature = "binary_string"))]
+#[cfg(all(not(feature = "binary_string"), not(feature = "cow_string"),))]
 fn read_mqtt_string(stream: &mut Bytes) -> Result<MqttString, Error> {
     let bytes = read_mqtt_bytes(stream)?;
     match std::str::from_utf8(&bytes) {
@@ -469,6 +501,17 @@ fn read_mqtt_string(stream: &mut Bytes) -> Result<MqttString, Error> {
         Err(_) => Err(Error::TopicNotUtf8),
     }
 }
+
+#[inline]
+#[cfg(feature = "cow_string")]
+fn read_mqtt_string(stream: &mut Bytes) -> Result<Cow<'static, str>, Error> {
+    let bytes = read_mqtt_bytes(stream)?;
+    match std::str::from_utf8(&bytes) {
+        Ok(v) => Ok(Cow::Owned(v.to_string())),
+        Err(_) => Err(Error::TopicNotUtf8),
+    }
+}
+
 #[inline]
 #[cfg(feature = "binary_string")]
 fn read_mqtt_string(stream: &mut Bytes) -> Result<MqttString, Error> {

@@ -6,6 +6,7 @@ resolver = "2"
 
 [features]
 default = []
+cow_string = []
 boxed_string = []
 binary_string = []
 
