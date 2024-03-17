@@ -13,13 +13,13 @@ Based on [rumqttc](https://github.com/bytebeamio/rumqtt)
 use bytes::BytesMut;
 use mqtt_bytes_v5::{Packet, PubAck, PubAckReason, Error};
 
+let mut buf: BytesMut = BytesMut::new();
 let packet = Packet::PubAck(PubAck {
     pkid: 42,
     reason: PubAckReason::Success,
     properties: None,
 });
-let mut buf: BytesMut = BytesMut::new();
-let result: Result<usize, Error> = out.write(&mut buf);
+let result: Result<usize, Error> = packet.write(&mut buf);
 let result: Result<Packet, Error>  = Packet::read(&mut buf, None);
 ```
 
