@@ -10,7 +10,8 @@ Based on [rumqttc](https://github.com/bytebeamio/rumqtt)
 # Usage
 
 ```rust
-use mqtt_bytes_v5::{Packet, PubAck, PubAckReason};
+use bytes::BytesMut;
+use mqtt_bytes_v5::{Packet, PubAck, PubAckReason, Error};
 
 let packet = Packet::PubAck(PubAck {
     pkid: 42,
@@ -18,8 +19,8 @@ let packet = Packet::PubAck(PubAck {
     properties: None,
 });
 let mut buf: BytesMut = BytesMut::new();
-let result: Result<usize, crate::Error> = out.write(&mut buf);
-let result: Result<Packet, crate::Error>  = Packet::read(&mut buf, None);
+let result: Result<usize, Error> = out.write(&mut buf);
+let result: Result<Packet, Error>  = Packet::read(&mut buf, None);
 ```
 
 # Features
