@@ -549,7 +549,14 @@ mod test {
     }
 
     fn write_read_provider() -> Vec<Packet> {
+        let mut properties = ConnAckProperties::new();
+        properties.assigned_client_identifier = Some("client".into());
         vec![
+            Packet::ConnAck(ConnAck {
+                session_present: true,
+                code: ConnectReturnCode::Success,
+                properties: Some(properties),
+            }),
             Packet::ConnAck(ConnAck {
                 session_present: false,
                 code: ConnectReturnCode::Success,
